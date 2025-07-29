@@ -11,4 +11,5 @@
 
 
 # Ignorar o ficheiro de configuração local com as senhas
-/src/main/resources/application.properties
+/resources/
+/application.properties
