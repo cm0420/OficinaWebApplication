@@ -10,8 +10,10 @@ import entity.Peca;
 import entity.PecaUtilizada;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,11 @@ public class OrdemDeServicoService {
     PecaUtilizadaRepository pecaUtilizadaRepository;
     @Autowired
     FinanceiroService financeiroService;
+    @Autowired
+    private IdGeneratorService idGeneratorService;
+
+    @Value("${oficina.negocio.custo.mao-de-obra}") // Injeta o custo da mão de obra
+    private BigDecimal custoMaoDeObra;
 
     public List<OrdemDeServico> findAll() {
         return ordemDeServicoRepository.findAll();
@@ -53,6 +60,11 @@ public class OrdemDeServicoService {
         novaOS.setDefeito_relatado(defeitoRelatado);
         novaOS.setData_abertura(LocalDateTime.now());
         novaOS.setStatus("AGUARDANDO"); // Estado inicial
+
+        Long proximoId = idGeneratorService.getNextId("ordem_de_servico");
+        String numeroOsFormatado = "Ordem-Serviço" + String.format("%03d", proximoId);
+        novaOS.setNumero_os(numeroOsFormatado);
+
 
         // 3. Salva a nova OS no banco
         OrdemDeServico osSalva = ordemDeServicoRepository.save(novaOS);
@@ -115,8 +127,10 @@ public class OrdemDeServicoService {
         os.setStatus("FINALIZADA");
         os.setData_fechamento(LocalDateTime.now());
 
+        BigDecimal valorTotal = calcularValorTotal(os);
+
         // Chama o serviço financeiro para registrar a receita e a comissão
-        financeiroService.registrarFaturamentoOS(os);
+        financeiroService.registrarFaturamentoOS(os, valorTotal);
 
         return ordemDeServicoRepository.save(os);
     }
@@ -130,5 +144,14 @@ public class OrdemDeServicoService {
 
         os.setStatus("CANCELADA");
         return ordemDeServicoRepository.save(os);
+    }
+    public BigDecimal calcularValorTotal(OrdemDeServico os) {
+        // Soma o subtotal de todas as peças
+        BigDecimal totalPecas = os.getPecasUtilizadas().stream()
+                .map(peca -> peca.getPreco_no_momento_do_uso().multiply(new BigDecimal(peca.getQuantidade_utilizada())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Adiciona o custo da mão de obra
+        return totalPecas.add(custoMaoDeObra);
     }
 }

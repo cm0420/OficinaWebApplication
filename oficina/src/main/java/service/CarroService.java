@@ -18,6 +18,8 @@ public class CarroService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private IdGeneratorService idGeneratorService;
 
     public List<Carro> findAll() {
         return carroRepository.findAll();
@@ -39,6 +41,10 @@ public class CarroService {
         if (carroRepository.existsById(carro.getId_carro())) {
             throw new IllegalArgumentException("Carro com este ID já cadastrado.");
         }
+
+        Long proximoId = idGeneratorService.getNextId("carro");
+        String idFormatado = "Carro-" + String.format("%03d", proximoId);
+        carro.setId_carro(idFormatado);
 
         carro.setDono(dono);
         return carroRepository.save(carro);

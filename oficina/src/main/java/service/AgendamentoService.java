@@ -77,7 +77,7 @@ public class AgendamentoService {
         // Regra de negócio: Se o cancelamento for no mesmo dia, registrar taxa.
         if (agendamento.getData_hora().toLocalDate().isEqual(LocalDate.now())) {
             String motivo = "Cancelamento no dia do serviço (" + LocalDate.now() + ")";
-            financeiroService.registrarTaxaCancelamento(agendamento.getCliente(), 30.00, motivo);
+            financeiroService.registrarTaxaCancelamento(agendamento.getCliente(), motivo);
         }
 
         agendamentoRepository.deleteById(id);

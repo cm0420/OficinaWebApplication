@@ -16,6 +16,8 @@ public class EstoqueService {
 
     @Autowired
     private FinanceiroService financeiroService;
+    @Autowired
+    private IdGeneratorService idGeneratorService;
 
     public List<Peca> findAll(){
         return pecaRepository.findAll();
@@ -33,6 +35,10 @@ public class EstoqueService {
 
         String descricao = "Compra inicial de " + peca.getQuantidade() + "x " + peca.getNome();
         financeiroService.registrarDespesaPecas(descricao, custoTotal);
+
+        Long proximoId = idGeneratorService.getNextId("peca");
+        String idFormatado = "PR-" + String.format("%03d", proximoId);
+        peca.setId_produto(idFormatado);
 
         return pecaRepository.save(peca);
     }

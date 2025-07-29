@@ -8,6 +8,7 @@ import entity.OrdemDeServico;
 import entity.RegistroFinanceiro;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,38 +19,55 @@ import java.util.List;
 @Service
 public class FinanceiroService {
     @Autowired
-    RegistroFinanceiroRepository registroFinanceiroRepository;
+    private RegistroFinanceiroRepository registroFinanceiroRepository;
+
     @Autowired
-    FuncionarioRepository funcionarioRepository;
+    private FuncionarioRepository funcionarioRepository;
+
+    // Injetando os valores configurados do application.properties
+    @Value("${oficina.negocio.salario.atendente}")
+    private BigDecimal salarioAtendente;
+
+    @Value("${oficina.negocio.salario.mecanico}")
+    private BigDecimal salarioMecanico;
+
+    @Value("${oficina.negocio.comissao.percentual}")
+    private BigDecimal percentualComissao;
+
+    @Value("${oficina.negocio.taxa-cancelamento.valor}")
+    private BigDecimal taxaCancelamento;
+
+
     @Transactional
-    public void registrarTaxaCancelamento(Cliente cliente, Double valorTaxa, String motivo) {
+    public void registrarTaxaCancelamento(Cliente cliente, String motivo) {
         RegistroFinanceiro registro = new RegistroFinanceiro();
         registro.setTipo("RECEITA_CANCELAMENTO");
         registro.setDescricao("Taxa de cancelamento para cliente " + cliente.getNome() + ". Motivo: " + motivo);
-        registro.setValor(new BigDecimal(valorTaxa));
+        registro.setValor(taxaCancelamento); // <-- USA A VARIÁVEL CONFIGURADA
         registro.setData(LocalDateTime.now());
         registroFinanceiroRepository.save(registro);
     }
+
     @Transactional
-    public void registrarFaturamentoOS(OrdemDeServico os) {
+    public void registrarFaturamentoOS(OrdemDeServico os, BigDecimal valorTotal) {
         // 1. Registra a receita total da OS
         RegistroFinanceiro receita = new RegistroFinanceiro();
         receita.setTipo("RECEITA_SERVICO");
-        BigDecimal valorTotal = os.calcularValorTotal(); // Este método precisa ser criado na OS
         receita.setValor(valorTotal);
         receita.setDescricao("Receita da OS #" + os.getNumero_os() + " para cliente " + os.getCliente().getNome());
         receita.setData(LocalDateTime.now());
         registroFinanceiroRepository.save(receita);
 
-        // 2. Registra a despesa da comissão do mecânico (ex: 5%)
+        // 2. Registra a despesa da comissão do mecânico
         RegistroFinanceiro comissao = new RegistroFinanceiro();
         comissao.setTipo("DESPESA_COMISSAO");
-        BigDecimal valorComissao = valorTotal.multiply(new BigDecimal("0.05"));
+        BigDecimal valorComissao = valorTotal.multiply(percentualComissao); // <-- USA A VARIÁVEL CONFIGURADA
         comissao.setValor(valorComissao);
-        comissao.setDescricao("Comissão (5%) da OS #" + os.getNumero_os() + " para mecânico " + os.getMecanico().getNome());
+        comissao.setDescricao("Comissão (" + (percentualComissao.doubleValue() * 100) + "%) da OS #" + os.getNumero_os() + " para mecânico " + os.getMecanico().getNome());
         comissao.setData(LocalDateTime.now());
         registroFinanceiroRepository.save(comissao);
     }
+
     @Transactional
     public void registrarDespesaPecas(String descricao, BigDecimal valorTotal) {
         RegistroFinanceiro registro = new RegistroFinanceiro();
@@ -59,14 +77,14 @@ public class FinanceiroService {
         registro.setData(LocalDateTime.now());
         registroFinanceiroRepository.save(registro);
     }
+
     @Transactional
     public void pagarSalarios() {
         List<Funcionario> funcionarios = funcionarioRepository.findAll();
         for (Funcionario f : funcionarios) {
             BigDecimal salario = BigDecimal.ZERO;
-            if ("Atendente".equals(f.getCargo())) salario = new BigDecimal("1000.00");
-            if ("Mecanico".equals(f.getCargo())) salario = new BigDecimal("1500.00");
-            // Adicionar outros cargos se necessário
+            if ("Atendente".equals(f.getCargo())) salario = salarioAtendente; // <-- USA A VARIÁVEL CONFIGURADA
+            if ("Mecanico".equals(f.getCargo())) salario = salarioMecanico; // <-- USA A VARIÁVEL CONFIGURADA
 
             if (salario.compareTo(BigDecimal.ZERO) > 0) {
                 RegistroFinanceiro registro = new RegistroFinanceiro();
