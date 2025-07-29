@@ -26,5 +26,5 @@ public class RegistroPonto {
     @Column(nullable = false)
     private LocalDateTime data_hora_entrada;
 
-    private LocalDate data_hora_salida;
+    private LocalDateTime data_hora_saida;
 }

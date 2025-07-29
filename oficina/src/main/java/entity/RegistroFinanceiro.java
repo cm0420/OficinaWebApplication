@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="registros_financeiros")
@@ -23,5 +24,5 @@ public class RegistroFinanceiro {
 
     private String tipo;
     @Column(nullable = false)
-    private LocalDate data;
+    private LocalDateTime data;
 }

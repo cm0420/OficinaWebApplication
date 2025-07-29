@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name= "agendamentos")
@@ -17,7 +18,7 @@ public class Agendamento {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private LocalDate data_hora;
+    private LocalDateTime data_hora;
 
     private String tipo_sevico;
 

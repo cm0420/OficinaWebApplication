@@ -36,16 +36,32 @@ public class ClienteService {
         }
         return clienteRepository.save(cliente);
     }
+
     @Transactional
-    public void delete(String id) {
-        Optional<Cliente> clienteOpt = clienteRepository.findById(id);
+    public void delete(String cpf) {
+        Optional<Cliente> clienteOpt = clienteRepository.findByCpf(cpf);
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
             if (carroRepository.findCarroByDonoCpf(cliente.getCpf()).isEmpty()) {
-                clienteRepository.deleteById(id);
+                clienteRepository.deleteClienteByCpf(cpf);
             } else {
                 throw new IllegalStateException("Não é possível remover um cliente que possui veículos cadastrados.");
             }
         }
+    }
+
+    @Transactional
+    public Cliente update(String cpf, Cliente clienteAtualizado) {
+
+        Cliente clienteExistente = clienteRepository.deleteClienteByCpf(cpf)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente com cpf " + cpf + " não encontrado."));
+
+
+        clienteExistente.setNome(clienteAtualizado.getNome());
+        clienteExistente.setTelefone(clienteAtualizado.getTelefone());
+        clienteExistente.setEndereco(clienteAtualizado.getEndereco());
+        clienteExistente.setEmail(clienteAtualizado.getEmail());
+
+        return clienteRepository.save(clienteExistente);
     }
 }
