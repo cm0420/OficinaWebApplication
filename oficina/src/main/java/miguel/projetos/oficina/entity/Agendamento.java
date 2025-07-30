@@ -17,21 +17,17 @@ public class Agendamento {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private LocalDateTime data_hora;
+    private LocalDateTime dataHora;
 
-    private String tipo_sevico;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_cliente", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Cliente cliente;
+    private String tipoServico;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Cliente cliente;
+
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_carro", nullable = false)

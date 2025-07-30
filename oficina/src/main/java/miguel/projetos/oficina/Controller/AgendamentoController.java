@@ -70,8 +70,8 @@ public class AgendamentoController {
     private AgendamentoDto convertToDto(Agendamento agendamento) {
         AgendamentoDto dto = new AgendamentoDto();
         dto.setId(agendamento.getId());
-        dto.setData_hora(agendamento.getData_hora());
-        dto.setTipo_servico(agendamento.getTipo_sevico());
+        dto.setData_hora(agendamento.getDataHora());
+        dto.setTipo_servico(agendamento.getTipoServico());
         // A conversão de DTOs aninhados (cliente, carro, mecanico) precisaria ser implementada.
         return dto;
     }
@@ -79,16 +79,16 @@ public class AgendamentoController {
     private Agendamento convertToEntity(AgendamentoDto dto) {
         Agendamento agendamento = new Agendamento();
         agendamento.setId(dto.getId());
-        agendamento.setData_hora(dto.getData_hora());
-        agendamento.setTipo_sevico(dto.getTipo_servico());
+        agendamento.setDataHora(dto.getData_hora());
+        agendamento.setTipoServico(dto.getTipo_servico());
         // A conversão de entidades aninhadas precisaria ser implementada.
         return agendamento;
     }
 
     private Agendamento convertCreateDtoToEntity(AgendamentoCreateDto createDto) {
         Agendamento agendamento = new Agendamento();
-        agendamento.setData_hora(createDto.getData());
-        agendamento.setTipo_sevico(createDto.getTipo_servico());
+        agendamento.setDataHora(createDto.getData());
+        agendamento.setTipoServico(createDto.getTipo_servico());
         // Você precisaria buscar as entidades relacionadas (Cliente, Carro, Funcionario)
         // usando os IDs do DTO e defini-los na entidade Agendamento.
         return agendamento;

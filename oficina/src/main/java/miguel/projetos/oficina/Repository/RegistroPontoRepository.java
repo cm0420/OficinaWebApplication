@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface RegistroPontoRepository extends CrudRepository<RegistroPonto, Long> {
     List<RegistroPonto> findByFuncionario(Funcionario funcionario);
-    Optional<RegistroPonto> findFirstByFuncionarioAndData_hora_saidaIsNullOrderByData_hora_entradaDesc(Funcionario funcionario);
+    Optional<RegistroPonto> findFirstByFuncionarioAndDataHoraSaidaIsNullOrderByDataHoraEntradaDesc(Funcionario funcionario);
 }

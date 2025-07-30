@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
     List<Agendamento> findByMecanico(Funcionario mecanico);
     List<Agendamento> findByDataHoraBetween(LocalDateTime start, LocalDateTime end);
-    boolean existsByMecanicoAndData_hora(Funcionario mecanico, LocalDateTime dataHora);
+    boolean existsByMecanicoAndDataHora(Funcionario mecanico, LocalDateTime dataHora); // <-- CORRIGIDO
 
-    Optional<Agendamento> findByMecanicoAndData_hora(Funcionario mecanico, LocalDateTime dataHora);
+    Optional<Agendamento> findByMecanicoAndDataHora(Funcionario mecanico, LocalDateTime dataHora); // <-- CORRIGIDO
 }

@@ -23,7 +23,7 @@ public class RegistroPonto {
     private Funcionario funcionario;
 
     @Column(nullable = false)
-    private LocalDateTime data_hora_entrada;
+    private LocalDateTime dataHoraEntrada;
 
-    private LocalDateTime data_hora_saida;
+    private LocalDateTime dataHoraSaida;
 }

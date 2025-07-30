@@ -33,10 +33,10 @@ public class AgendamentoService {
     @Transactional
     public Agendamento save(Agendamento agendamento) {
         // 1. Valida o horário de funcionamento
-        validarHorarioFuncionamento(agendamento.getData_hora());
+        validarHorarioFuncionamento(agendamento.getDataHora());
 
         // 2. Valida se o mecânico já tem um agendamento nesse horário
-        if (agendamentoRepository.existsByMecanicoAndData_hora(agendamento.getMecanico(), agendamento.getData_hora())) {
+        if (agendamentoRepository.existsByMecanicoAndDataHora(agendamento.getMecanico(), agendamento.getDataHora())) {
             throw new IllegalStateException("O mecânico selecionado já possui um agendamento neste horário.");
         }
 
@@ -50,10 +50,10 @@ public class AgendamentoService {
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento com ID " + id + " não encontrado."));
 
         // Valida o novo horário
-        validarHorarioFuncionamento(agendamentoAtualizado.getData_hora());
+        validarHorarioFuncionamento(agendamentoAtualizado.getDataHora());
 
-        Optional<Agendamento> agendamentoConflitanteOpt = agendamentoRepository.findByMecanicoAndData_hora(
-                agendamentoAtualizado.getMecanico(), agendamentoAtualizado.getData_hora()
+        Optional<Agendamento> agendamentoConflitanteOpt = agendamentoRepository.findByMecanicoAndDataHora(
+                agendamentoAtualizado.getMecanico(), agendamentoAtualizado.getDataHora()
         );
         // Valida conflito de horário, mas permite a alteração se o conflito for com o próprio agendamento que está a ser editado.
         if (agendamentoConflitanteOpt.isPresent() && !agendamentoConflitanteOpt.get().getId().equals(id)) {
@@ -64,8 +64,8 @@ public class AgendamentoService {
         agendamentoExistente.setCliente(agendamentoAtualizado.getCliente());
         agendamentoExistente.setCarro(agendamentoAtualizado.getCarro());
         agendamentoExistente.setMecanico(agendamentoAtualizado.getMecanico());
-        agendamentoExistente.setData_hora(agendamentoAtualizado.getData_hora());
-        agendamentoExistente.setTipo_sevico(agendamentoAtualizado.getTipo_sevico());
+        agendamentoExistente.setDataHora(agendamentoAtualizado.getDataHora());
+        agendamentoExistente.setTipoServico(agendamentoAtualizado.getTipoServico());
 
         return agendamentoRepository.save(agendamentoExistente);
     }
@@ -75,7 +75,7 @@ public class AgendamentoService {
                 .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado."));
 
         // Regra de negócio: Se o cancelamento for no mesmo dia, registrar taxa.
-        if (agendamento.getData_hora().toLocalDate().isEqual(LocalDate.now())) {
+        if (agendamento.getDataHora().toLocalDate().isEqual(LocalDate.now())) {
             String motivo = "Cancelamento no dia do serviço (" + LocalDate.now() + ")";
             financeiroService.registrarTaxaCancelamento(agendamento.getCliente(), motivo);
         }

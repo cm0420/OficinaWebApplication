@@ -18,7 +18,7 @@ public class PontoService {
     @Transactional
     public RegistroPonto baterPontoEntrada(Funcionario funcionario) {
         // Regra de negócio: Verifica se já existe um ponto em aberto para o funcionário
-        Optional<RegistroPonto> pontoAberto = registroPontoRepository.findFirstByFuncionarioAndData_hora_saidaIsNullOrderByData_hora_entradaDesc(funcionario);
+        Optional<RegistroPonto> pontoAberto = registroPontoRepository.findFirstByFuncionarioAndDataHoraSaidaIsNullOrderByDataHoraEntradaDesc(funcionario);
 
         if (pontoAberto.isPresent()) {
             throw new IllegalStateException("Funcionário já possui um ponto em aberto.");
@@ -26,16 +26,16 @@ public class PontoService {
 
         RegistroPonto novoRegistro = new RegistroPonto();
         novoRegistro.setFuncionario(funcionario);
-        novoRegistro.setData_hora_entrada(LocalDateTime.now());
+        novoRegistro.setDataHoraEntrada(LocalDateTime.now());
         return registroPontoRepository.save(novoRegistro);
     }
     @Transactional
     public RegistroPonto baterPontoSaida(Funcionario funcionario) {
         // Regra de negócio: Encontra o último ponto aberto para registrar a saída
-        RegistroPonto registroAberto = registroPontoRepository.findFirstByFuncionarioAndData_hora_saidaIsNullOrderByData_hora_entradaDesc(funcionario)
+        RegistroPonto registroAberto = registroPontoRepository.findFirstByFuncionarioAndDataHoraSaidaIsNullOrderByDataHoraEntradaDesc(funcionario)
                 .orElseThrow(() -> new IllegalStateException("Nenhum ponto em aberto encontrado para este funcionário."));
 
-        registroAberto.setData_hora_saida(LocalDateTime.now());
+        registroAberto.setDataHoraSaida(LocalDateTime.now());
         return registroPontoRepository.save(registroAberto);
     }
 }
