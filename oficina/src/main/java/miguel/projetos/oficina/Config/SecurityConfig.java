@@ -38,6 +38,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(
+                            "/swagger-ui.html",
+                            "/swagger-ui/**",
+                            "/v3/api-docs",
+                            "/v3/api-docs/**",
+                            "/swagger-resources",
+                            "/swagger-resources/**",
+                            "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/financeiro/**", "/api/funcionarios/**").hasRole("GERENTE")
                         .anyRequest().authenticated()
                 )
