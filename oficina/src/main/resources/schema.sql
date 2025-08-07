@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS funcionarios (
     cargo VARCHAR(50) NOT NULL,
     email VARCHAR(255)
 );
-
+INSERT INTO funcionarios (id_usuario, cpf, nome, senha, cargo)
+VALUES
+    ('User-000', '12345678910', 'Admin Gerente', '1234', 'Gerente')
+    ON CONFLICT (cpf) DO NOTHING;
 -- Exemplo: adicione aqui a criação das demais tabelas necessárias
 -- CREATE TABLE IF NOT EXISTS cliente (...);
 -- CREATE TABLE IF NOT EXISTS carro (...);
