@@ -26,28 +26,38 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private FuncionarioRepository funcionarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid LoginRequestDto data) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto data) {
+        // Se a autenticação falhar, o Spring lança AuthenticationException.
+        // O RestExceptionHandler irá capturar e retornar uma resposta 401 padronizada.
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.getCpf(), data.getSenha());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((Funcionario) auth.getPrincipal());
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
-    @Autowired
-    private FuncionarioRepository funcionarioRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/changepassword")
-    public ResponseEntity<?> mudarSenha(
+    public ResponseEntity<String> mudarSenha(
             @RequestBody @Valid ChangePasswordDto data,
             @AuthenticationPrincipal Funcionario funcionarioLogado
     ) {
+        // Validação da senha
         if (!passwordEncoder.matches(data.getSenhaAtual(), funcionarioLogado.getSenha())) {
-            return ResponseEntity.status(403).body("Senha atual incorreta.");
+            // Lança uma exceção em vez de retornar uma resposta manual.
+            // O RestExceptionHandler irá capturar e retornar um erro 400 padronizado.
+            throw new IllegalArgumentException("A senha atual fornecida está incorreta.");
         }
 
+        // Lógica de negócio permanece a mesma
         funcionarioLogado.setSenha(passwordEncoder.encode(data.getNovaSenha()));
         funcionarioRepository.save(funcionarioLogado);
+
         return ResponseEntity.ok("Senha alterada com sucesso.");
     }
 }
