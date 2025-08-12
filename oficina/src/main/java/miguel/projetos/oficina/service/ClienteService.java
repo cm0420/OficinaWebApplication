@@ -1,14 +1,16 @@
 package miguel.projetos.oficina.service;
 
+import jakarta.transaction.Transactional;
 import miguel.projetos.oficina.Repository.CarroRepository;
 import miguel.projetos.oficina.Repository.ClienteRepository;
+import miguel.projetos.oficina.Repository.OrdemDeServicoRepository;
 import miguel.projetos.oficina.dto.ClienteDto;
 import miguel.projetos.oficina.entity.Cliente;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -19,6 +21,8 @@ public class ClienteService {
     private CarroRepository carroRepository;
     @Autowired
     IdGeneratorService idGeneratorService;
+    @Autowired
+    OrdemDeServicoRepository ordemDeServicoRepository;
 
     public List<Cliente> findAll() {
         return clienteRepository.findAll();
@@ -47,15 +51,17 @@ public class ClienteService {
 
     @Transactional
     public void delete(String cpf) {
-        Optional<Cliente> clienteOpt = clienteRepository.findByCpf(cpf);
-        if (clienteOpt.isPresent()) {
-            Cliente cliente = clienteOpt.get();
-            if (carroRepository.findCarroByDonoCpf(cliente.getCpf()).isEmpty()) {
-                clienteRepository.deleteClienteByCpf(cpf);
-            } else {
-                throw new IllegalStateException("Não é possível remover um cliente que possui veículos cadastrados.");
-            }
+        // Encontra o cliente ou lança uma exceção se não existir
+        Cliente cliente = clienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> new NoSuchElementException("Cliente com CPF " + cpf + " não encontrado."));
+        if (!ordemDeServicoRepository.findByCliente(cliente).isEmpty()) {
+            throw new IllegalStateException("Não é possível remover um cliente que possui ordens de serviço no histórico.");
         }
+        if (!carroRepository.findCarroByDonoCpf(cliente.getCpf()).isEmpty()) {
+            throw new IllegalStateException("Não é possível remover um cliente que possui veículos cadastrados.");
+        }
+        // Se passar em todas as validações, deleta o cliente.
+        clienteRepository.delete(cliente);
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package miguel.projetos.oficina.service;
 
 import miguel.projetos.oficina.Repository.CarroRepository;
 import miguel.projetos.oficina.Repository.ClienteRepository;
+import miguel.projetos.oficina.Repository.OrdemDeServicoRepository;
 import miguel.projetos.oficina.entity.Carro;
 import miguel.projetos.oficina.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.lang.IllegalArgumentException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -20,6 +22,8 @@ public class CarroService {
     private ClienteRepository clienteRepository;
     @Autowired
     private IdGeneratorService idGeneratorService;
+    @Autowired
+    OrdemDeServicoRepository ordemDeServicoRepository;
 
     public List<Carro> findAll() {
         return carroRepository.findAll();
@@ -65,8 +69,12 @@ public class CarroService {
 
     @Transactional
     public void deleteById(String id) {
-        // Lógica de validação: Não permitir apagar carro com Ordens de Serviço
-        // Esta validação deve ser adicionada aqui, consultando o OrdemDeServicoRepository
+        Carro carro = carroRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Carro com ID " + id + " não encontrado."));
+        if (!ordemDeServicoRepository.findByCarro(carro).isEmpty()) {
+            throw new IllegalStateException("Não é possível remover um carro que possui ordens de serviço no histórico.");
+        }
+
         carroRepository.deleteById(id);
     }
 }
