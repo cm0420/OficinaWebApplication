@@ -49,6 +49,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
                 .requestMatchers("/api/financeiro/**", "/api/funcionarios/**").hasRole("GERENTE")
                 .anyRequest().authenticated()
             )

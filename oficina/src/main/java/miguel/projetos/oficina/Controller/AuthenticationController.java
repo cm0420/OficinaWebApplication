@@ -1,14 +1,18 @@
 package miguel.projetos.oficina.Controller;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 import miguel.projetos.oficina.Repository.FuncionarioRepository;
 import miguel.projetos.oficina.dto.ChangePasswordDto;
@@ -31,7 +35,22 @@ public class AuthenticationController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@AuthenticationPrincipal org.springframework.security.core.userdetails.User user) {
+        // Se seu principal é a entidade Funcionario, troque o tipo acima por Funcionario
+        // e devolva os campos que quiser (cpf/nome/cargo).
+        String cpf = user.getUsername(); // deve ser o CPF que veio no token
+        var opt = funcionarioRepository.findFuncionarioByCpf(cpf);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
 
+        var f = opt.get();
+        var body = Map.of(
+            "cpf", f.getCpf(),
+            "nome", f.getNome(),
+            "cargo", f.getCargo()
+        );
+        return ResponseEntity.ok(body);
+    }
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto data) {
         // Se a autenticação falhar, o Spring lança AuthenticationException.
