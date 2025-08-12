@@ -2,7 +2,6 @@ package miguel.projetos.oficina.Config;
 
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,28 +43,39 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+        throws ServletException, IOException {
 
-        String token = recoverToken(request);
-        if (token != null) {
-            try {
-                String subject = tokenService.validateToken(token); // não pode lançar pra fora
-                if (subject != null) {
-                    UserDetails user = funcionarioRepository.findFuncionarioByCpf(subject).orElse(null);
-                    if (user != null) {
-                        var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
-                }
-            } catch (Exception e) {
-                // Token inválido/expirado/assinado errado: não autentica e segue o fluxo
-                // (deixa a autorização barrar depois, sem derrubar com 500)
-            }
-        }
-
+    // CORS preflight: não tenta autenticar
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
         chain.doFilter(request, response);
+        return;
     }
+
+    String token = recoverToken(request);
+    if (token != null) {
+        try {
+            String subject = tokenService.validateToken(token); // deve ser o CPF
+            if (subject != null) {
+                // ⚠️ garante só dígitos
+                String cpf = subject.replaceAll("\\D", "");
+
+                UserDetails user = funcionarioRepository.findFuncionarioByCpf(cpf).orElse(null);
+                if (user != null) {
+                    var auth = new UsernamePasswordAuthenticationToken(
+                        user, null, user.getAuthorities() // precisa conter ROLE_GERENTE
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            }
+        } catch (Exception e) {
+            // token inválido/expirado -> segue sem autenticar
+        }
+    }
+
+    chain.doFilter(request, response);
+}
+
 
     private String recoverToken(HttpServletRequest request) {
         String auth = request.getHeader("Authorization");
