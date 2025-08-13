@@ -7,6 +7,9 @@ WORKDIR /app
 COPY pom.xml mvnw ./
 COPY .mvn .mvn
 
+# Dá permissão de execução pro Maven Wrapper
+RUN chmod +x mvnw
+
 # Baixa dependências para aproveitar cache
 RUN ./mvnw dependency:go-offline -B
 
