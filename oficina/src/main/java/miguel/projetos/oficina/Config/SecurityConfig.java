@@ -22,33 +22,48 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.annotation.PostConstruct;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Autowired
     SecurityFilter securityFilter;
-    
+
+    /**
+     * Env (ou application.properties):
+     * FRONTEND_ORIGIN=https://oficina.flipafile.com,https://*.flipafile.com,http://localhost:3000
+     *
+     * Obs: com allowCredentials(true) NÃO use "*" literal.
+     */
     @Value("${frontend.origin}")
-    private String frontendOrigins; // Mudei o nome para ficar mais claro que são múltiplas origens
-    
+    private String frontendOrigins;
+
+    @PostConstruct
+    void logCors() {
+        System.out.println("[CORS] frontend.origin=" + frontendOrigins);
+    }
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .cors(c -> c.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> authorize
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                // libera somente o preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers(
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/v3/api-docs",
-                    "/v3/api-docs/**",
-                    "/swagger-resources",
-                    "/swagger-resources/**",
+                    "/swagger-ui.html", "/swagger-ui/**",
+                    "/v3/api-docs", "/v3/api-docs/**",
+                    "/swagger-resources", "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
+
                 .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
                 .requestMatchers("/api/financeiro/**", "/api/funcionarios/**").hasRole("GERENTE")
                 .anyRequest().authenticated()
@@ -59,24 +74,42 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // Divide as origens por vírgula e remove espaços em branco
-        configuration.setAllowedOrigins(Arrays.stream(frontendOrigins.split(","))
-                .map(String::trim)
-                .toList());
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration cfg = new CorsConfiguration();
+
+        // limpa entradas vazias e espaços
+        List<String> origins = Arrays.stream(frontendOrigins.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isBlank())
+            .toList();
+
+        // Use patterns para aceitar curingas como https://*.flipafile.com
+        cfg.setAllowedOriginPatterns(origins);
+
+        // métodos de app + OPTIONS para o preflight
+        cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+
+        // só cabeçalhos usuais; ajuste se precisar de mais
+        cfg.setAllowedHeaders(Arrays.asList(
+            "Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"
+        ));
+
+        // o front costuma ler Authorization/Location
+        cfg.setExposedHeaders(Arrays.asList("Authorization", "Location"));
+
+        // necessário se usa cookie/JWT em header com Origin específico
+        cfg.setAllowCredentials(true);
+
+        // cache do preflight no browser
+        cfg.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", cfg);
         return source;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+        return cfg.getAuthenticationManager();
     }
 
     @Bean
