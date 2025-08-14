@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -83,7 +86,10 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
-
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
     private String recoverToken(HttpServletRequest request) {
         String auth = request.getHeader("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) return null;
