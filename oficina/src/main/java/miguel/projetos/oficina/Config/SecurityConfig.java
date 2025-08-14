@@ -1,7 +1,9 @@
 package miguel.projetos.oficina.Config;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final SecurityFilter securityFilter;
 
     public SecurityConfig(SecurityFilter securityFilter) {
@@ -54,25 +55,29 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    @Value("${frontend.origin}")
+    private String frontendOrigin;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
-        // Use exato se só vai aceitar 1 origem:
-        // cfg.setAllowedOrigins(List.of("https://oficina.flipafile.com"));
+        // Suporta várias origens (separadas por vírgula no env)
+        List<String> origins = Arrays.stream(frontendOrigin.split(","))
+                                    .map(String::trim)
+                                    .toList();
 
-        // Use patterns se quiser permitir curingas (ex.: subdomínios):
-        cfg.setAllowedOriginPatterns(List.of("https://oficina.flipafile.com"));
-        // Ex.: cfg.setAllowedOriginPatterns(List.of("https://*.flipafile.com"));
+        cfg.setAllowedOriginPatterns(origins);
 
         cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of("Authorization","Content-Type","Accept","Origin","X-Requested-With"));
         cfg.setExposedHeaders(List.of("Authorization","Location"));
-        cfg.setAllowCredentials(true);        // se usa cookies/Authorization
-        cfg.setMaxAge(3600L);                 // cache do preflight
+        cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
+
 }
