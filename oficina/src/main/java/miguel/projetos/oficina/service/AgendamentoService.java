@@ -1,8 +1,10 @@
 package miguel.projetos.oficina.service;
 
 import miguel.projetos.oficina.Repository.AgendamentoRepository;
+import miguel.projetos.oficina.Repository.FuncionarioRepository;
 import miguel.projetos.oficina.entity.Agendamento;
 import jakarta.transaction.Transactional;
+import miguel.projetos.oficina.entity.Funcionario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +12,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class AgendamentoService {
+    @Autowired
+    FuncionarioRepository funcionarioRepository;
     @Autowired
     private AgendamentoRepository agendamentoRepository;
     @Autowired
@@ -43,6 +48,21 @@ public class AgendamentoService {
         return agendamentoRepository.save(agendamento);
     }
 
+    @Transactional
+    public Agendamento puxarProximoAgendamento(String cpfMecanico){
+
+        Funcionario mecanico = funcionarioRepository.findFuncionarioByCpf(cpfMecanico)
+                .orElseThrow(() -> new NoSuchElementException("Mecânico com CPF " + cpfMecanico + " não encontrado."));
+
+        Agendamento proximoAgendamento = agendamentoRepository
+                .findByMecanicoAndDataHora(mecanico, LocalDateTime.now())
+                .orElseThrow(() -> new IllegalStateException("Nenhum agendamento futuro encontrado para este mecânico."));
+
+        proximoAgendamento.setDataHora(LocalDateTime.now());
+
+        // 5. Salva a alteração no banco e retorna o agendamento atualizado
+        return agendamentoRepository.save(proximoAgendamento);
+    }
 
     @Transactional
     public Agendamento update(Long id, Agendamento agendamentoAtualizado) {

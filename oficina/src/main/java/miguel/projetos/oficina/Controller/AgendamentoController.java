@@ -50,6 +50,11 @@ public class AgendamentoController {
                 .orElseThrow(() -> new NoSuchElementException("Agendamento com ID " + id + " não encontrado."));
         return ResponseEntity.ok(convertToDto(agendamento));
     }
+    @PostMapping("/mecanico/{cpf}/puxar-proximo")
+    public ResponseEntity<AgendamentoDto> puxarProximoAgendamento(@PathVariable String cpf) {
+        Agendamento agendamentoAdiantado = agendamentoService.puxarProximoAgendamento(cpf);
+        return ResponseEntity.ok(convertToDto(agendamentoAdiantado));
+    } 
 
     @PostMapping
     public ResponseEntity<AgendamentoDto> create(@Valid @RequestBody AgendamentoCreateDto createDto) {

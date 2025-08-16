@@ -16,4 +16,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     boolean existsByMecanicoAndDataHora(Funcionario mecanico, LocalDateTime dataHora); // <-- CORRIGIDO
 
     Optional<Agendamento> findByMecanicoAndDataHora(Funcionario mecanico, LocalDateTime dataHora); // <-- CORRIGIDO
+
+    Optional<Agendamento> findFirstByMecanicoAndDataHora(Funcionario mecanico, LocalDateTime dataHora);
+
 }
