@@ -1,0 +1,35 @@
+# ===================================================================
+# CONFIGURAÇÃO DA CONEXÃO COM O BANCO DE DADOS POSTGRESQL
+# ===================================================================
+# URL de conexão JDBC para o banco de dados
+spring.datasource.url=jdbc:postgresql://oficina-postgres:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Usuário e senha (a senha deve ser configurada via variáveis de ambiente)
+spring.datasource.username=${DB_USER:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+
+# ===================================================================
+# CONFIGURAÇÃO DO HIBERNATE (JPA)
+# ===================================================================
+# Define o "dialeto" que o Hibernate usará para se comunicar com o PostgreSQL
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Valida o esquema do banco ao iniciar, mas não altera nada.
+# É a opção mais segura para produção e desenvolvimento controlado.
+spring.jpa.hibernate.ddl-auto=validate
+
+# Mostra no console o SQL que está sendo executado pelo Hibernate
+spring.jpa.show-sql=true
+
+# ===================================================================
+# CONFIGURAÇÃO DO SERVIDOR DE E-MAIL (Exemplo para Gmail)
+# ===================================================================
+#spring.mail.host=smtp.gmail.com
+#spring.mail.port=587
+#spring.mail.username=${MAIL_USERNAME}
+#spring.mail.password=${MAIL_PASSWORD} # Usar senha de app do Google
+#spring.mail.properties.mail.smtp.auth=true
+#spring.mail.properties.mail.smtp.starttls.enable=true
