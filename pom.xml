@@ -91,6 +91,61 @@
 	<build>
 		<plugins>
 			<plugin>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-maven-plugin</artifactId>
+			<version>1.8</version>
+			<executions>
+				<execution>
+				<id>generate-openapi</id>
+				<phase>process-classes</phase>
+				<goals>
+					<goal>generate</goal>
+				</goals>
+				<configuration>
+					<!-- pacote base dos seus controllers -->
+					<packagesToScan>miguel.projetos.oficina</packagesToScan>
+					<!-- onde escrever -->
+					<outputDir>${project.build.directory}/openapi</outputDir>
+					<outputFileName>openapi.json</outputFileName>
+					<!-- não precisa subir servidor -->
+					<scanDependencies>false</scanDependencies>
+				</configuration>
+				</execution>
+			</executions>
+			</plugin>
+			<!-- Converte openapi.json em Markdown -->
+			<plugin>
+			<groupId>org.openapitools</groupId>
+			<artifactId>openapi-generator-maven-plugin</artifactId>
+			<version>7.6.0</version>
+			<executions>
+				<execution>
+				<id>openapi-to-markdown</id>
+				<phase>generate-resources</phase>
+				<goals>
+					<goal>generate</goal>
+				</goals>
+				<configuration>
+					<generatorName>markdown</generatorName>
+					<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
+					<output>${project.build.directory}/api-docs</output>
+					<configOptions>
+					<appName>Oficina API</appName>
+					</configOptions>
+				</configuration>
+				<dependencies>
+					<!-- força o generator a estar disponível no build -->
+					<dependency>
+					<groupId>org.openapitools</groupId>
+					<artifactId>openapi-generator-cli</artifactId>
+					<version>7.6.0</version>
+					</dependency>
+				</dependencies>
+				</execution>
+			</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.14.0</version>
