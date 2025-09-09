@@ -1,7 +1,23 @@
 # 🚗 Oficina API
 
+[![API Prod](https://img.shields.io/badge/API-Prod-green)](https://apioficina.flipafile.com)
+[![Swagger UI](https://img.shields.io/badge/Swagger-UI-blue)](https://apioficina.flipafile.com/swagger-ui.html)
+[![OpenAPI JSON](https://img.shields.io/badge/OpenAPI-JSON-orange)](https://apioficina.flipafile.com/v3/api-docs)
+[![Docs MD](https://img.shields.io/badge/Docs-Markdown-lightgrey)](https://apioficina.flipafile.com/docs/download-md)
+
 Backend em **Spring Boot (JDK 24)** para gestão de oficina mecânica.  
 A aplicação está conteinerizada via **Dockerfile** e usa **PostgreSQL** como banco de dados.
+
+---
+
+## 🌐 Deploy
+
+- **Produção:** [https://apioficina.flipafile.com](https://apioficina.flipafile.com)  
+- **Swagger UI:** [https://apioficina.flipafile.com/swagger-ui.html](https://apioficina.flipafile.com/swagger-ui.html)  
+- **OpenAPI JSON:** [https://apioficina.flipafile.com/v3/api-docs](https://apioficina.flipafile.com/v3/api-docs)  
+- **Documentação Markdown:**  
+  - [api-docs.md](https://apioficina.flipafile.com/docs/download-md)  
+  - [docs.zip](https://apioficina.flipafile.com/docs/download-md-all)
 
 ---
 
@@ -13,8 +29,6 @@ A aplicação está conteinerizada via **Dockerfile** e usa **PostgreSQL** como 
 - [Docker](https://www.docker.com/)
 - [Spring Security + JWT] para autenticação
 - [OpenAPI / Swagger UI](https://swagger.io/tools/swagger-ui/) para documentação
-
----
 
 ## ▶️ Como rodar
 
