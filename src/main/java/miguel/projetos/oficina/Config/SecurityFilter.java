@@ -43,6 +43,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         "/swagger-resources/**",
         "/webjars/**",
         "/actuator/**",
+        "/docs/download-md",
         "/error"
     );
 

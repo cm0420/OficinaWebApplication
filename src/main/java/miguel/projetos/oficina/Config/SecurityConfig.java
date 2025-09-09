@@ -45,11 +45,12 @@ public class SecurityConfig {
         "/swagger-ui.html","/swagger-ui/**",
         "/v3/api-docs","/v3/api-docs/**",
         "/swagger-resources","/swagger-resources/**",
-        "/webjars/**"
+        "/webjars/**","/docs/download-md"   // ✅ corrigido aqui
     ).permitAll()
 
     // auth básica
     .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
+
 
     // ======= REGRAS AJUSTADAS =======
     // Financeiro: só gerente
