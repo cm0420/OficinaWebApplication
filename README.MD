@@ -28,7 +28,7 @@ A aplicação está conteinerizada via **Dockerfile** e usa **PostgreSQL** como 
 
 ```bash
 # clone o projeto
-git clone https://github.com/seuuser/OficinaWebApplication.git
+git clone https://github.com/cm0420/OficinaWebApplication.git
 cd OficinaWebApplication/oficina
 
 # build da imagem
