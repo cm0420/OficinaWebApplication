@@ -44,7 +44,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         "/webjars/**",
         "/actuator/**",
         "/docs/download-md",
-        "/error"
+        "/error",
+        "/docs/download-md-all"  
     );
 
     @Override

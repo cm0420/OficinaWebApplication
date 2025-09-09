@@ -45,7 +45,7 @@ public class SecurityConfig {
         "/swagger-ui.html","/swagger-ui/**",
         "/v3/api-docs","/v3/api-docs/**",
         "/swagger-resources","/swagger-resources/**",
-        "/webjars/**","/docs/download-md"   // ✅ corrigido aqui
+        "/webjars/**","/docs/download-md", "/docs/download-md-all"    // ✅ corrigido aqui
     ).permitAll()
 
     // auth básica
