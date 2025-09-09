@@ -9,45 +9,35 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @RestController
 public class DocsController {
 
+    private final DocsMarkdownService markdownService;
+
+    public DocsController(DocsMarkdownService markdownService) {
+        this.markdownService = markdownService;
+    }
+
     @GetMapping("/docs/download-md")
     public ResponseEntity<Resource> downloadDocs() {
         try {
             Path openapiFile = Path.of("docs/openapi.json");
-            if (!Files.exists(openapiFile)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String json = Files.readString(openapiFile);
-
-            // Aqui você pode usar uma lib tipo swagger2markup, mas vamos fazer simples:
-            String markdown = """
-                # 📄 Documentação da API
-
-                Este arquivo foi gerado automaticamente a partir do OpenAPI.
-
-                ```json
-                %s
-                ```
-                """.formatted(json);
-
+            String markdown = markdownService.generateMarkdownFromOpenApi(openapiFile);
             byte[] bytes = markdown.getBytes();
-            Resource resource = new ByteArrayResource(bytes);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=api-docs.md")
                     .contentType(MediaType.parseMediaType("text/markdown"))
                     .contentLength(bytes.length)
-                    .body(resource);
+                    .body(new ByteArrayResource(bytes));
 
         } catch (Exception e) {
+            byte[] err = ("Erro gerando Markdown: " + e.getMessage()).getBytes();
             return ResponseEntity.internalServerError()
-                    .body(new ByteArrayResource(("Erro: " + e.getMessage()).getBytes()));
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(new ByteArrayResource(err));
         }
     }
 }
