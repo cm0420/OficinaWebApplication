@@ -1,170 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.4</version>
-		<relativePath/>
-	</parent>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.4</version>
+    <relativePath/>
+  </parent>
 
-	<groupId>miguel.projetos</groupId>
-	<artifactId>oficina</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>oficina</name>
-	<description>First Api in Java Spring</description>
+  <groupId>miguel.projetos</groupId>
+  <artifactId>oficina</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>oficina</name>
+  <description>First Api in Java Spring</description>
 
-	<properties>
-		<java.version>24</java.version>
-	</properties>
+  <properties>
+    <java.version>24</java.version>
+  </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>io.github.cdimascio</groupId>
-			<artifactId>dotenv-java</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-		<groupId>org.springdoc</groupId>
-		<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-		<version>2.8.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>4.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <version>3.0.0</version>
+    </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-maven-plugin</artifactId>
-			<version>1.8</version>
-			<executions>
-				<execution>
-				<id>generate-openapi</id>
-				<phase>process-classes</phase>
-				<goals>
-					<goal>generate</goal>
-				</goals>
-				<configuration>
-					<!-- pacote base dos seus controllers -->
-					<packagesToScan>miguel.projetos.oficina</packagesToScan>
-					<!-- onde escrever -->
-					<outputDir>${project.build.directory}/openapi</outputDir>
-					<outputFileName>openapi.json</outputFileName>
-					<!-- não precisa subir servidor -->
-					<scanDependencies>false</scanDependencies>
-				</configuration>
-				</execution>
-			</executions>
-			</plugin>
-			<!-- Converte openapi.json em Markdown -->
-			<plugin>
-			<groupId>org.openapitools</groupId>
-			<artifactId>openapi-generator-maven-plugin</artifactId>
-			<version>7.6.0</version>
-			<executions>
-				<execution>
-				<id>openapi-to-markdown</id>
-				<phase>generate-resources</phase>
-				<goals>
-					<goal>generate</goal>
-				</goals>
-				<configuration>
-					<generatorName>markdown</generatorName>
-					<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
-					<output>${project.build.directory}/api-docs</output>
-					<configOptions>
-					<appName>Oficina API</appName>
-					</configOptions>
-				</configuration>
-				<dependencies>
-					<!-- força o generator a estar disponível no build -->
-					<dependency>
-					<groupId>org.openapitools</groupId>
-					<artifactId>openapi-generator-cli</artifactId>
-					<version>7.6.0</version>
-					</dependency>
-				</dependencies>
-				</execution>
-			</executions>
-			</plugin>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.8.9</version>
+    </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.14.0</version>
-				<configuration>
-					<release>${java.version}</release>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
 
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>4.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.14.0</version>
+      <configuration>
+        <release>${java.version}</release>
+        <annotationProcessorPaths>
+          <path>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+          </path>
+        </annotationProcessorPaths>
+      </configuration>
+    </plugin>
+
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</build>
 </project>
